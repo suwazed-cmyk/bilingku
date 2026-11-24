@@ -116,16 +116,19 @@ if ($form) {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var sel = document.getElementById('r_panel'); if (!sel) return;
-    var nm = document.getElementById('r_name'), hp = document.getElementById('r_host'), hint = document.getElementById('r_panelhint'), cmd = document.getElementById('r_cmd');
+    var nm = document.getElementById('r_name'), hp = document.getElementById('r_host'), hint = document.getElementById('r_panelhint'), cmd = document.getElementById('r_cmd'), ph = document.getElementById('r_porthint');
     function upd(fill) {
         var o = sel.options[sel.selectedIndex], on = !!sel.value;
         hint.style.display = on ? '' : 'none';
+        if (ph) ph.style.display = on ? '' : 'none';
         if (!on) return;
         var vps = o.dataset.vps || 'IP-VPS';
         cmd.textContent = '/ip service set api disabled=no address=' + vps + '/32\n/user add name=bilingku group=full password=SANDI-KUAT address=' + vps + '/32';
         if (fill) {
             if (!nm.value) nm.value = o.dataset.name;
-            hp.value = (o.dataset.addr || '') + ':8728';
+            // port yang sudah diisi dipertahankan; bila kosong dipakai port API bawaan MikroTik 8728
+            var m = hp.value.match(/:(\d{1,5})\s*$/);
+            hp.value = (o.dataset.addr || '') + ':' + (m ? m[1] : '8728');
         }
     }
     sel.addEventListener('change', function () { upd(true); });
@@ -135,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <?php } ?>
 <div class="frow"><label for="r_name">Router Name</label><input id="r_name" name="name" value="<?= h($e['name']) ?>" required placeholder="Kantor pusat"></div>
 <div class="frow"><label for="r_host">Address : Port</label><input id="r_host" name="host" value="<?= h($hp) ?>" required placeholder="103.10.20.30:8728 atau id-1.tunnel.com:8728"></div>
+<?php if (!empty($PR)) { ?><p id="r_porthint" class="muted" style="margin:-4px 0 12px;font-size:12.5px<?= empty($e['panel_id']) ? ';display:none' : '' ?>">IP diisi otomatis dari VPN panel utama. <b>:8728</b> adalah port API bawaan MikroTik (Winbox → IP → Services → <b>api</b>). Bila port API router Anda diganti, ubah angka setelah titik dua. Tidak perlu port forwarding: Bilingku menghubungi router langsung lewat VPN.</p><?php } ?>
 <div class="frow"><label for="r_user">Username</label><input id="r_user" name="user" value="<?= h($e['user']) ?>" required></div>
 <div class="frow"><label for="r_pass">Password</label><div class="join"><input id="r_pass" name="pass" type="password" autocomplete="new-password"<?= isset($rs[$edit]) ? '' : ' required' ?> placeholder="<?= isset($rs[$edit]) ? 'Kosongkan bila tidak diganti' : '' ?>"><button type="button" class="btn eye" data-eye="#r_pass" title="Lihat kata sandi" aria-label="Lihat kata sandi"><?= icon('eye') ?></button></div></div>
 <div class="fsep">Voucher</div>
