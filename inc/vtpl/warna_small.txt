@@ -1,0 +1,33 @@
+<?php
+// Copy Paste ke template editor [Settings -> Template Editor].
+$fmt = ['/(\d+)w/', '/(\d+)d/', '/(\d+)h/', '/(\d+)m/', '/(\d+)s/'];
+$ke = ['$1 Minggu ', '$1 Hari ', '$1 Jam ', '$1 Menit ', '$1 Detik '];
+$aktif = trim(preg_replace($fmt, $ke, $validity));
+$waktu = trim(preg_replace($fmt, $ke, $timelimit));
+$harga = intval($getsprice) > 0 ? intval($getsprice) : intval($getprice);
+$singkat = $harga >= 1000 ? ($harga / 1000) . 'rb' : $harga;
+?>
+<?php
+if ($harga <= 3000) { $warna = "#1e9e5a"; }
+elseif ($harga <= 5000) { $warna = "#1b76ad"; }
+elseif ($harga <= 10000) { $warna = "#7a3fb0"; }
+elseif ($harga <= 25000) { $warna = "#d9822b"; }
+else { $warna = "#c0392b"; }
+?>
+<style>
+/* 5 kolom, lebar mengikuti kertas */
+.bk-voucher-print{width:20.0000%;padding:2px;box-sizing:border-box;position:relative}
+.vws{display:inline-block;width:100%;margin:0;border-radius:7px;color:#fff;font-family:Arial,sans-serif;padding:3px 5px 4px;vertical-align:top;box-sizing:border-box}
+.vws-top{display:flex;justify-content:space-between;font-size:8px;font-weight:700}
+.vws-top b{font-size:11px}
+.vws-code{font:700 15px/1.2 "Courier New",monospace;background:#fff;color:#1f2d3a;border-radius:4px;text-align:center;margin-top:2px;letter-spacing:.04em}
+.vws-up{font:700 10px/1.25 "Courier New",monospace;background:#fff;color:#1f2d3a;border-radius:4px;padding:1px 4px;margin-top:2px}
+.bk-voucher-print .lb{display:inline-block;min-width:40px;margin-right:5px;font:700 7px Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;opacity:.75;vertical-align:middle}
+.bk-voucher-print .vst{position:absolute;right:5px;top:50%;transform:translateY(-50%) rotate(-9deg);padding:1px 9px;border:2px solid #c0392b;border-radius:4px;background:rgba(255,255,255,.88);color:#c0392b;font:900 10px Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;pointer-events:none}
+.bk-voucher-print .vst-active{border-color:#b9770e;color:#b9770e}
+</style>
+<div class="vws" style="background:<?= $warna ?>">
+<div class="vws-top"><span><?= $aktif ?></span><b><?= $harga > 0 ? $singkat : "" ?></b></div>
+<?php if ($usermode == "vc") { ?><div class="vws-code"><?= $username ?></div><?php } else { ?><div class="vws-up"><span class="lb">Username</span><?= $username ?><br><span class="lb">Password</span><?= $password ?></div><?php } ?>
+<?php if ($status != "new") { ?><span class="vst vst-<?= $status ?>"><?= $statustext ?></span><?php } ?>
+</div>

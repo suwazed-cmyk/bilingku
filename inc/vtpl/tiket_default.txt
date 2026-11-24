@@ -1,0 +1,41 @@
+<?php
+// Copy Paste ke template editor [Settings -> Template Editor].
+$fmt = ['/(\d+)w/', '/(\d+)d/', '/(\d+)h/', '/(\d+)m/', '/(\d+)s/'];
+$ke = ['$1 Minggu ', '$1 Hari ', '$1 Jam ', '$1 Menit ', '$1 Detik '];
+$aktif = trim(preg_replace($fmt, $ke, $validity));
+$waktu = trim(preg_replace($fmt, $ke, $timelimit));
+$harga = intval($getsprice) > 0 ? intval($getsprice) : intval($getprice);
+$singkat = $harga >= 1000 ? ($harga / 1000) . 'rb' : $harga;
+?>
+<style>
+/* 3 kolom, lebar mengikuti kertas */
+.bk-voucher-print{width:33.3333%;padding:2px;box-sizing:border-box;position:relative}
+.vt{display:inline-flex;width:100%;margin:0;font-family:Arial,sans-serif;border:1.5px solid #222;border-radius:6px;overflow:hidden;vertical-align:top;background:#fff;color:#111;box-sizing:border-box}
+.vt-stub{width:70px;flex:none;background:#222;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;border-right:2px dashed #fff;text-align:center}
+.vt-stub small{font-size:8px;opacity:.75;letter-spacing:.08em}
+.vt-stub b{font-size:17px;line-height:1.15}
+.vt-stub i{font-style:normal;font-size:9px;margin-top:3px}
+.vt-main{flex:1;min-width:0;padding:5px 8px}
+.vt-hs{font-size:9px;font-weight:700;letter-spacing:.05em;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt-code{font:700 21px/1.15 "Courier New",monospace;letter-spacing:.06em;margin:2px 0}
+.vt-up{font:700 13px/1.3 "Courier New",monospace;margin:2px 0}
+.vt-meta{font-size:9px;color:#444}
+.vt .qrcode{width:50px;height:50px;float:right;margin-left:4px}
+.bk-voucher-print .lb{display:inline-block;min-width:40px;margin-right:5px;font:700 7px Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;opacity:.75;vertical-align:middle}
+.bk-voucher-print .vst{position:absolute;right:5px;top:50%;transform:translateY(-50%) rotate(-9deg);padding:1px 9px;border:2px solid #c0392b;border-radius:4px;background:rgba(255,255,255,.88);color:#c0392b;font:900 13px Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;pointer-events:none}
+.bk-voucher-print .vst-active{border-color:#b9770e;color:#b9770e}
+</style>
+<div class="vt">
+<div class="vt-stub"><small>HARGA</small><b><?= $harga > 0 ? $singkat : "-" ?></b><?php if ($aktif != "") { ?><i><?= $aktif ?></i><?php } ?></div>
+<div class="vt-main">
+<?php if ($qr == "yes") { ?><?= $qrcode ?><?php } ?>
+<div class="vt-hs"><?= $hotspotname ?></div>
+<?php if ($usermode == "vc") { ?>
+<div class="vt-code"><?= $username ?></div>
+<?php } else { ?>
+<div class="vt-up"><span class="lb">Username</span><?= $username ?><br><span class="lb">Password</span><?= $password ?></div>
+<?php } ?>
+<div class="vt-meta"><?php if ($waktu != "") { ?>Waktu <?= $waktu ?> · <?php } ?><?php if ($dnsname != "") { ?><?= $dnsname ?><?php } ?> #<?= $num ?></div>
+</div>
+<?php if ($status != "new") { ?><span class="vst vst-<?= $status ?>"><?= $statustext ?></span><?php } ?>
+</div>

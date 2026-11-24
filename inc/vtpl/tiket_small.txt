@@ -1,0 +1,30 @@
+<?php
+// Copy Paste ke template editor [Settings -> Template Editor].
+$fmt = ['/(\d+)w/', '/(\d+)d/', '/(\d+)h/', '/(\d+)m/', '/(\d+)s/'];
+$ke = ['$1 Minggu ', '$1 Hari ', '$1 Jam ', '$1 Menit ', '$1 Detik '];
+$aktif = trim(preg_replace($fmt, $ke, $validity));
+$waktu = trim(preg_replace($fmt, $ke, $timelimit));
+$harga = intval($getsprice) > 0 ? intval($getsprice) : intval($getprice);
+$singkat = $harga >= 1000 ? ($harga / 1000) . 'rb' : $harga;
+?>
+<style>
+/* 4 kolom, lebar mengikuti kertas */
+.bk-voucher-print{width:25.0000%;padding:2px;box-sizing:border-box;position:relative}
+.vts{display:inline-flex;width:100%;margin:0;font-family:Arial,sans-serif;border:1px solid #222;border-radius:4px;overflow:hidden;vertical-align:top;background:#fff;color:#111;box-sizing:border-box}
+.vts-stub{width:38px;flex:none;background:#222;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border-right:1.5px dashed #fff;padding:2px}
+.vts-main{flex:1;min-width:0;padding:2px 5px}
+.vts-code{font:700 15px/1.2 "Courier New",monospace;letter-spacing:.04em}
+.vts-up{font:700 10px/1.25 "Courier New",monospace}
+.vts-meta{font-size:8px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-voucher-print .lb{display:inline-block;min-width:40px;margin-right:5px;font:700 7px Arial,sans-serif;letter-spacing:.05em;text-transform:uppercase;opacity:.75;vertical-align:middle}
+.bk-voucher-print .vst{position:absolute;right:5px;top:50%;transform:translateY(-50%) rotate(-9deg);padding:1px 9px;border:2px solid #c0392b;border-radius:4px;background:rgba(255,255,255,.88);color:#c0392b;font:900 10px Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;pointer-events:none}
+.bk-voucher-print .vst-active{border-color:#b9770e;color:#b9770e}
+</style>
+<div class="vts">
+<div class="vts-stub"><?= $harga > 0 ? $singkat : "-" ?></div>
+<div class="vts-main">
+<?php if ($usermode == "vc") { ?><div class="vts-code"><?= $username ?></div><?php } else { ?><div class="vts-up"><span class="lb">Username</span><?= $username ?><br><span class="lb">Password</span><?= $password ?></div><?php } ?>
+<div class="vts-meta"><?= $aktif ?><?= $waktu != "" ? " · " . $waktu : "" ?></div>
+</div>
+<?php if ($status != "new") { ?><span class="vst vst-<?= $status ?>"><?= $statustext ?></span><?php } ?>
+</div>

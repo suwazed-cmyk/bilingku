@@ -1,0 +1,8 @@
+# Data pengguna (database, konfigurasi, login router, penjualan, sesi) tidak boleh masuk repo
+data/
+assets/upload/
+*.db
+*.db-wal
+*.db-shm
+*.tmp
+.DS_Store

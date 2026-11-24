@@ -1,0 +1,42 @@
+<?php
+// Copy Paste ke template editor [Settings -> Template Editor].
+$fmt = ['/(\d+)w/', '/(\d+)d/', '/(\d+)h/', '/(\d+)m/', '/(\d+)s/'];
+$ke = ['$1 Minggu ', '$1 Hari ', '$1 Jam ', '$1 Menit ', '$1 Detik '];
+$aktif = trim(preg_replace($fmt, $ke, $validity));
+$waktu = trim(preg_replace($fmt, $ke, $timelimit));
+$harga = intval($getsprice) > 0 ? intval($getsprice) : intval($getprice);
+$singkat = $harga >= 1000 ? ($harga / 1000) . 'rb' : $harga;
+?>
+<style>
+/* 4 kolom, lebar mengikuti kertas */
+.bk-voucher-print{width:25%;padding:2px;box-sizing:border-box;position:relative}
+.vm{width:100%;box-sizing:border-box;border:1px dashed #333;border-radius:6px;padding:5px 7px 4px;font-family:Arial,sans-serif;color:#000;background:#fff}
+.vm-hd{display:flex;justify-content:space-between;align-items:baseline;gap:6px;border-bottom:1.5px solid #000;padding-bottom:3px;margin-bottom:4px}
+.vm-hd span{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vm-hd b{font-size:13px;white-space:nowrap}
+.vm-bd{display:flex;gap:6px;align-items:center}
+.vm-tx{flex:1;min-width:0}
+.vm-lb{font-size:7.5px;font-weight:700;color:#555;letter-spacing:.08em;text-transform:uppercase}
+.vm-val{font:700 15px/1.15 "Courier New",monospace;letter-spacing:.04em;margin-bottom:2px;white-space:nowrap;overflow:hidden}
+.vm-code{font:700 19px/1.15 "Courier New",monospace;letter-spacing:.06em}
+.vm .qrcode{width:54px;height:54px;flex:none}
+.vm-ft{display:flex;justify-content:space-between;gap:4px;font-size:8px;color:#333;border-top:1px dotted #777;margin-top:3px;padding-top:2px}
+.bk-voucher-print .vst{position:absolute;right:5px;top:50%;transform:translateY(-50%) rotate(-9deg);padding:1px 9px;border:2px solid #000;border-radius:4px;background:rgba(255,255,255,.88);color:#000;font:900 13px Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;pointer-events:none}
+.bk-voucher-print .vst-active{border-color:#555;color:#555}
+</style>
+<div class="vm">
+<div class="vm-hd"><span><?= $hotspotname ?></span><b><?= $price ?></b></div>
+<div class="vm-bd">
+<div class="vm-tx">
+<?php if ($usermode == "vc") { ?>
+<div class="vm-lb">Kode Voucher</div><div class="vm-code"><?= $username ?></div>
+<?php } else { ?>
+<div class="vm-lb">Username</div><div class="vm-val"><?= $username ?></div>
+<div class="vm-lb">Password</div><div class="vm-val"><?= $password ?></div>
+<?php } ?>
+</div>
+<?php if ($qr == "yes") { ?><?= $qrcode ?><?php } ?>
+</div>
+<div class="vm-ft"><span><?= $aktif != "" ? "Aktif " . $aktif : "" ?><?= $waktu != "" ? " · " . $waktu : "" ?></span><span><?= $dnsname != "" ? $dnsname : "" ?></span></div>
+<?php if ($status != "new") { ?><span class="vst vst-<?= $status ?>"><?= $statustext ?></span><?php } ?>
+</div>

@@ -1,0 +1,45 @@
+<style>
+.doc-paper{max-width:148mm;margin:0 auto;border:1px solid #000;padding:8mm;color:#000;font:14px/1.45 "Helvetica",Arial,sans-serif;background:#fff}
+.doc-paper .head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:.6rem;margin-bottom:.8rem}
+.doc-paper .co{display:flex;gap:.6rem;align-items:flex-start}.doc-paper .co img{height:42px;width:auto}
+.doc-paper .co strong{display:block;font-size:1.15rem}
+.doc-paper .title{text-align:right}.doc-paper .title h1{margin:0;font-size:1.4rem;letter-spacing:.03em}
+.doc-paper table{width:100%;border-collapse:collapse}
+.doc-paper th,.doc-paper td{text-align:left;padding:.42rem .3rem;border-bottom:1px solid #bbb;vertical-align:top}
+.doc-paper th{width:38%;color:#333;font-weight:600}
+.doc-paper .total th,.doc-paper .total td{border-bottom:2px solid #000;font-size:1.1rem;font-weight:700}
+.doc-paper .stamp{display:inline-block;margin:1rem 0 .5rem;padding:.2rem .9rem;border:2px solid #000;font-weight:700;letter-spacing:.04em}
+.doc-paper .stamp.late{border-color:#b00;color:#b00}
+.doc-paper .foot{font-size:.85rem;color:#333;margin-top:.4rem}
+.thermal .doc-paper{max-width:58mm;padding:2mm;border:0;font-size:11px}
+.thermal .doc-paper .head{display:block;text-align:center}.thermal .doc-paper .co{justify-content:center}.thermal .doc-paper .title{text-align:center;margin-top:.4rem}
+.thermal .doc-paper th{width:45%}
+</style>
+
+<div class="doc-paper">
+  <div class="head">
+    <div class="co">
+      <img src="<?= $logo ?>" alt="logo">
+      <div><strong><?= $company ?></strong><?= $address ?><br><?= $phone ?></div>
+    </div>
+    <div class="title"><h1>TAGIHAN</h1><div><?= $user ?></div><div><?= $date ?></div></div>
+  </div>
+  <table>
+    <tr><th>Pelanggan</th><td><?= $nama ?></td></tr>
+    <tr><th>ID pelanggan</th><td><?= $user ?></td></tr>
+<?php if ($alamat != "") { ?>
+    <tr><th>Alamat</th><td><?= $alamat ?></td></tr>
+<?php } ?>
+    <tr><th>Paket</th><td><?= $paket ?></td></tr>
+    <tr><th>Tarif</th><td><?= $tarif ?> per bulan</td></tr>
+    <tr><th>Tagihan</th><td><?= $months ?> bulan</td></tr>
+    <tr><th>Jatuh Tempo</th><td><?= $due ?></td></tr>
+    <tr class="total"><th>Jumlah</th><td><?= $total ?></td></tr>
+  </table>
+<?php if ($late == "yes") { ?>
+  <p class="stamp late">LEWAT JATUH TEMPO</p>
+<?php } else { ?>
+  <p class="stamp">BELUM DIBAYAR</p>
+<?php } ?>
+  <div class="foot">Mohon lakukan pembayaran sebelum jatuh tempo. Terima kasih.</div>
+</div>

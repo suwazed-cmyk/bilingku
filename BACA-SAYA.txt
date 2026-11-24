@@ -1,0 +1,61 @@
+BILINGKU 2.0 — billing PPPoE & Hotspot MikroTik tanpa database
+================================================================
+
+Kebutuhan
+- Hosting PHP 7.4 atau lebih baru (shared hosting bisa), tanpa MySQL.
+- Hosting harus boleh membuka koneksi keluar ke port API router (bawaan 8728, atau 8729 untuk API-SSL).
+- Router punya IP publik, atau dijangkau lewat VPN remote / port forwarding.
+- Jam router harus benar (aktifkan NTP client), karena isolir dijalankan scheduler router.
+
+Pemasangan baru
+1. Unggah isi folder ini ke hosting, misalnya public_html/bilingku.
+2. Pastikan folder data/ bisa ditulis (izin 755 atau 775).
+3. Buka alamatnya di browser, buat akun admin, lalu tambahkan router.
+4. Di router, aktifkan API dan buat pengguna khusus:
+     /ip service set api disabled=no address=IP.HOSTING.ANDA/32
+     /user add name=bilingku group=full password=SANDI-KUAT address=IP.HOSTING.ANDA/32
+
+Naik versi dari 1.0
+1. Salin dulu folder data/ sebagai cadangan.
+2. Timpa semua berkas KECUALI folder data/. Hapus pages/invoices.php bila masih ada.
+3. Buka menu Pelanggan dan periksa tanggal jatuh tempo tiap pelanggan (tagihan lama diubah otomatis
+   menjadi jatuh tempo + riwayat pembayaran).
+4. Pengaturan > Pasang ulang semua scheduler.
+
+PPPoE: paket, jatuh tempo, isolir
+- Setiap pelanggan punya paket pilihan, tarif per bulan, dan satu tanggal jatuh tempo.
+- Selama belum lewat jatuh tempo, secret memakai paket pilihannya.
+- Untuk tiap pelanggan yang ditagih, panel memasang scheduler "iso-<pengguna>" di router. Sehari setelah
+  jatuh tempo scheduler itu memindahkan secret ke paket isolir (FUP Profile = profil isolir). Bila Validity pelanggan diisi (jumlah hari di FUP setelah jatuh tempo) dan habis, secret di-disable; dibayar = aktif lagi. Kosong = tidak pernah di-disable.
+  dan menghapusnya dari active connection. Scheduler berulang tiap hari, jadi tetap berjalan walau
+  router sempat mati pada hari jatuh tempo, dan tidak bergantung pada hosting atau cron.
+- Pembayaran bisa kapan saja, sebelum atau sesudah jatuh tempo, untuk 1 sampai 120 bulan sekaligus.
+  Jatuh tempo maju sebanyak bulan yang dibayar dan tanggalnya tetap (misalnya selalu tanggal 10).
+  Jika sudah tidak menunggak, paket dikembalikan dan koneksi diputus sekali supaya tersambung ulang
+  dengan paket normal.
+- Paket isolir (bawaan bernama "isolir") dibuat otomatis: 128k/128k dan address-list "isolir".
+  Supaya pelanggan yang diisolir benar-benar tidak bisa internet, tambahkan aturan firewall sendiri, misalnya:
+     /ip firewall filter add chain=forward src-address-list=isolir action=drop comment="pelanggan isolir"
+
+Hotspot
+- Profil voucher yang punya masa aktif memakai script on-login: saat voucher pertama kali login,
+  router membuat scheduler "exp-<voucher>" yang menghapus atau menonaktifkan voucher ketika masa aktif
+  habis, dan mencatat penjualan di /system script (komentar "bilingku-sale"). Catatan itu dipindahkan
+  ke data/ setiap Dasbor atau Laporan dibuka.
+- Script hotspot memakai format Mikhmon: penanda on-login dan catatan penjualan ber-kode "mikhmon", jadi profil dan Report tetap
+  terbaca oleh Mikhmon dan sebaliknya (catatan "bilingku" dari versi sebelumnya tetap ikut terbaca).
+- Label yang terlihat di router mengikuti Panel Name di Settings: comment scheduler Expire Monitor, comment paket isolir,
+  dan nama/comment scheduler PPP. Diperbarui saat Save Settings atau Save profil.
+- Kredit: fitur hotspot (Expired Mode, Expire Monitor, script on-login, template voucher) terinspirasi dari dan
+  sebagian kodenya diambil dari Mikhmon karya Laksamana Emha (laksa19).
+
+Data
+- Voucher, profil, secret, paket, dan scheduler ada di router.
+- Pelanggan, jatuh tempo, pembayaran, harga paket, dan arsip penjualan ada di folder data/.
+  Cadangkan dengan menyalin folder itu. Jangan hapus data/.htaccess.
+- Cron job hosting bersifat opsional (perintahnya ada di Pengaturan).
+
+Catatan uji
+- Diuji pada PHP 8.3 dengan simulasi RouterOS API, belum pada router asli. Sebelum dipakai penuh,
+  coba satu pelanggan: set jatuh tempo ke kemarin, simpan, lalu cek di router bahwa secret pindah ke
+  paket isolir dan scheduler "iso-..." muncul; kemudian terima pembayaran dan cek paketnya kembali.

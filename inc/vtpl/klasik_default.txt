@@ -1,0 +1,43 @@
+<?php
+// Copy Paste ke template editor [Settings -> Template Editor].
+$fmt = ['/(\d+)w/', '/(\d+)d/', '/(\d+)h/', '/(\d+)m/', '/(\d+)s/'];
+$ke = ['$1 Minggu ', '$1 Hari ', '$1 Jam ', '$1 Menit ', '$1 Detik '];
+$aktif = trim(preg_replace($fmt, $ke, $validity));
+$waktu = trim(preg_replace($fmt, $ke, $timelimit));
+$harga = intval($getsprice) > 0 ? intval($getsprice) : intval($getprice);
+$singkat = $harga >= 1000 ? ($harga / 1000) . 'rb' : $harga;
+?>
+<style>
+/* 4 kolom, lebar mengikuti kertas */
+.bk-voucher-print{width:25.0000%;padding:2px;box-sizing:border-box;position:relative}
+.vk{display:inline-block;width:100%;margin:0;border:1.5px solid #1b76ad;border-radius:8px;overflow:hidden;font-family:Arial,sans-serif;color:#1f2d3a;vertical-align:top;background:#fff;box-sizing:border-box}
+.vk-hd{display:flex;justify-content:space-between;gap:6px;background:#1b76ad;color:#fff;font-weight:700;font-size:11px;padding:5px 8px}
+.vk-hd span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.vk-hd b{white-space:nowrap}
+.vk-bd{padding:6px 8px 6px}
+.vk-lb{font-size:9px;color:#6b7a89;text-transform:uppercase;letter-spacing:.06em}
+.vk-code{font:700 22px/1.15 "Courier New",monospace;letter-spacing:.08em;margin:1px 0 5px}
+.vk-up{display:grid;grid-template-columns:auto 1fr;gap:0 6px;align-items:baseline;margin:0 0 5px;font-size:10px;color:#6b7a89}
+.vk-up b{font:700 15px/1.25 "Courier New",monospace;color:#1f2d3a}
+.vk-ft{display:flex;justify-content:space-between;font-size:10px;border-top:1px dashed #c9d3de;padding-top:4px}
+.vk-ft b{color:#1b76ad}
+.vk-dn{font-size:9px;color:#6b7a89;margin-top:2px;display:flex;justify-content:space-between}
+.vk .qrcode{width:56px;height:56px;float:right;margin:0 0 2px 6px}
+.bk-voucher-print .vst{position:absolute;right:5px;top:50%;transform:translateY(-50%) rotate(-9deg);padding:1px 9px;border:2px solid #c0392b;border-radius:4px;background:rgba(255,255,255,.88);color:#c0392b;font:900 13px Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;pointer-events:none}
+.bk-voucher-print .vst-active{border-color:#b9770e;color:#b9770e}
+</style>
+<div class="vk">
+<div class="vk-hd"><span><?= $hotspotname ?></span><b><?= $price ?></b></div>
+<div class="vk-bd">
+<?php if ($qr == "yes") { ?><?= $qrcode ?><?php } ?>
+<?php if ($usermode == "vc") { ?>
+<div class="vk-lb">Kode Voucher</div>
+<div class="vk-code"><?= $username ?></div>
+<?php } else { ?>
+<div class="vk-up"><span>Username</span><b><?= $username ?></b><span>Password</span><b><?= $password ?></b></div>
+<?php } ?>
+<div class="vk-ft"><span>Aktif <b><?= $aktif != "" ? $aktif : "-" ?></b></span><?php if ($waktu != "") { ?><span>Waktu <b><?= $waktu ?></b></span><?php } ?></div>
+<div class="vk-dn"><span><?php if ($dnsname != "") { ?>Login: http://<?= $dnsname ?><?php } ?></span><span>#<?= $num ?></span></div>
+</div>
+<?php if ($status != "new") { ?><span class="vst vst-<?= $status ?>"><?= $statustext ?></span><?php } ?>
+</div>
