@@ -1,8 +1,11 @@
-BILINGKU 2.0 — billing PPPoE & Hotspot MikroTik tanpa database
-================================================================
+BILINGKU — billing PPPoE & Hotspot MikroTik
+===========================================
+
+Data panel disimpan di database SQLite (data/bilingku.db). Bila hosting tidak punya pdo_sqlite,
+Bilingku otomatis memakai berkas JSON di folder data/ seperti versi lama.
 
 Kebutuhan
-- Hosting PHP 7.4 atau lebih baru (shared hosting bisa), tanpa MySQL.
+- Hosting PHP 7.4 atau lebih baru (shared hosting bisa), tanpa MySQL. Ekstensi pdo_sqlite dianjurkan.
 - Hosting harus boleh membuka koneksi keluar ke port API router (bawaan 8728, atau 8729 untuk API-SSL).
 - Router punya IP publik, atau dijangkau lewat VPN remote / port forwarding.
 - Jam router harus benar (aktifkan NTP client), karena isolir dijalankan scheduler router.

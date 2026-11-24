@@ -114,7 +114,7 @@ if ($form) {
 <div id="r_panelhint" class="muted" style="margin:-4px 0 12px;font-size:12.5px<?= empty($e['panel_id']) ? ';display:none' : '' ?>">Alamat router diambil dari panel utama setiap terhubung (lewat VPN), jadi tidak perlu membuka API ke internet. Di MikroTik, izinkan API dari VPS:
 <pre class="code" id="r_cmd" style="margin:6px 0 0;white-space:pre-wrap;font-size:12px"></pre></div>
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
     var sel = document.getElementById('r_panel'); if (!sel) return;
     var nm = document.getElementById('r_name'), hp = document.getElementById('r_host'), hint = document.getElementById('r_panelhint'), cmd = document.getElementById('r_cmd');
     function upd(fill) {
@@ -130,7 +130,7 @@ if ($form) {
     }
     sel.addEventListener('change', function () { upd(true); });
     upd(false);
-})();
+});
 </script>
 <?php } ?>
 <div class="frow"><label for="r_name">Router Name</label><input id="r_name" name="name" value="<?= h($e['name']) ?>" required placeholder="Kantor pusat"></div>
