@@ -88,7 +88,7 @@ module.exports = async function (C) {
       e = p;
       form = true;
     }
-  await page_head("PPP Profiles", form ? "" : '<a class="btn" href="' + h(url("ppp_profiles", { add: "fup" })) + '">' + icon("plus") + 'Add Isolir</a><a class="btn primary" href="' + h(url("ppp_profiles", { add: 1 })) + '">' + icon("plus") + "Add Profile</a>");
+  await page_head("PPP Profiles");
   if (form) {
     const pools = await rq("/ip/pool/print", { ".proplist": "name,ranges" });
     const queues = await rq("/queue/simple/print", { ".proplist": "name" });
@@ -132,7 +132,7 @@ module.exports = async function (C) {
   } else {
     const cnt = {};
     for (const s of await rq("/ppp/secret/print", { ".proplist": "profile" })) cnt[s.profile || ""] = (cnt[s.profile || ""] || 0) + 1;
-    echo('<section class="card"><div class="cardhead">' + icon("pie") + '<strong>PPP Profiles</strong><span class="muted">' + profiles.length + ' profil</span><span class="spacer"></span><input type="search" class="filter" data-filter="#tbl" placeholder="Cari profil…" aria-label="Cari"><a class="hl" href="' + h(url("ppp_profiles")) + '" title="Reload Data" aria-label="Reload Data">' + icon("reload") + "</a></div><div class=\"cardbody\">");
+    echo('<section class="card"><div class="cardhead">' + icon("pie") + '<div class="ttl"><strong>PPP Profiles</strong><small>' + profiles.length + ' paket &amp; profil isolir</small></div><div class="tools"><input type="search" class="filter" data-filter="#tbl" placeholder="Cari profil…" aria-label="Cari"><a class="hl icon" href="' + h(url("ppp_profiles")) + '" title="Muat ulang" aria-label="Reload Data">' + icon("reload") + '</a><a class="hl" href="' + h(url("ppp_profiles", { add: "fup" })) + '">' + icon("plus") + 'Add Isolir</a><a class="hl pri" href="' + h(url("ppp_profiles", { add: 1 })) + '">' + icon("plus") + 'Add Profile</a></div></div><div class="cardbody">');
     echo('<div class="tablewrap"><table id="tbl" class="grid-t sortable"><thead><tr><th>Name</th><th>Local Address</th><th>Remote Address</th><th>Rate Limit</th><th>Only One</th><th>Address List</th><th>Parent Queue</th><th class="r">Harga / bulan</th><th class="r">Secrets</th><th>Comment</th><th class="nosort"></th></tr></thead><tbody>');
     for (const p of profiles) {
       const def = (p.default || "") === "true";

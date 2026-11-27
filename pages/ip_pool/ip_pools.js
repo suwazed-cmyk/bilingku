@@ -40,7 +40,7 @@ module.exports = async function (C) {
   const pools = await rq("/ip/pool/print");
   let e = null;
   for (const x of pools) if (get("edit") !== "" && x[".id"] === get("edit")) e = x;
-  await page_head("IP Pool", e ? "" : '<button type="button" class="btn primary" data-open="#pooldlg">' + icon("plus") + "Add IP Pool</button>");
+  await page_head("IP Pool");
   if (e) {
     echo('<div class="split"><form method="post" class="card">' + csrf_field() + '<input type="hidden" name="act" value="save"><input type="hidden" name="id" value="' + h(e[".id"]) + '"><div class="cardhead">' + icon("pool") + '<strong>Edit IP Pool</strong><span class="spacer"></span><a class="x" href="' + h(url("ip_pools")) + '" title="Tutup" aria-label="Tutup">&times;</a></div><div class="cardbody">');
     echo('<div class="frow"><label for="e_name">Name</label><input id="e_name" name="name" value="' + h(e.name) + '" required pattern="[A-Za-z0-9_.\\-]+"></div><div class="frow"><label for="e_ranges">Ranges</label><input id="e_ranges" name="ranges" value="' + h(e.ranges || "") + '" required></div>');
@@ -50,7 +50,7 @@ module.exports = async function (C) {
   } else {
     const used = {};
     for (const p of await rq("/ppp/profile/print", { ".proplist": "name,remote-address" })) if ((p["remote-address"] || "") !== "") (used[p["remote-address"]] = used[p["remote-address"]] || []).push(p.name);
-    echo('<section class="card"><div class="cardhead">' + icon("pool") + '<strong>IP Pool</strong><span class="muted">' + pools.length + ' pool</span><span class="spacer"></span><a class="hl" href="' + h(url("ip_pools")) + '" title="Reload Data" aria-label="Reload Data">' + icon("reload") + '</a></div><div class="cardbody">');
+    echo('<section class="card"><div class="cardhead">' + icon("pool") + '<div class="ttl"><strong>IP Pool</strong><small>' + pools.length + ' pool di router</small></div><div class="tools"><a class="hl icon" href="' + h(url("ip_pools")) + '" title="Muat ulang" aria-label="Reload Data">' + icon("reload") + '</a><button type="button" class="hl pri" data-open="#pooldlg">' + icon("plus") + 'Add IP Pool</button></div></div><div class="cardbody">');
     if (!pools.length) echo('<div class="empty"><p class="emptytitle">Belum ada IP pool di router ini.</p><p><button type="button" class="btn primary" data-open="#pooldlg">Add IP Pool</button></p></div>');
     else {
       echo('<div class="tablewrap"><table id="tbl" class="grid-t sortable"><thead><tr><th>Name</th><th>Ranges</th><th>Next Pool</th><th>Dipakai profil PPP</th><th>Comment</th><th class="nosort"></th></tr></thead><tbody>');

@@ -437,6 +437,7 @@
 // tabel ber-bar halaman: bila isinya sedikit, kotak tabel diperpanjang sampai bawah layar supaya bar halaman selalu di dasar halaman
 (function () {
     var fit = function () {
+        return; // v4.1: tabel tidak lagi dipanjangkan sampai dasar layar (kotak kosong terlihat berantakan)
         // kotak yang diperpanjang: tabel ber-bar halaman, atau kotak "kosong" (mis. Belum ada user yang terhubung)
         var bars = document.querySelectorAll('main .pgbar'), bar = bars.length === 1 ? bars[0] : null, w = bar && bar.previousElementSibling;
         if (bars.length > 1) return; // beberapa tabel di satu halaman (mis. Report): biarkan apa adanya

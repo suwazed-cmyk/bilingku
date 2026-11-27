@@ -132,38 +132,37 @@ module.exports = async function (C) {
     echo(o);
   }
   // kartu ringkas status
-  const tiles = [["", "Total Voucher", "ticket", "blue"], ["online", "Online", "link", "green"], ["new", "Belum Dipakai", "wifi", "gray"], ["exp", "Expired", "clock", "amber"]];
+  const tiles = [["", "Total voucher", "ticket", "blue"], ["online", "Sedang online", "link", "green"], ["new", "Belum dipakai", "wifi", "gray"], ["exp", "Expired", "clock", "amber"]];
   echo('<div class="stats">');
   for (const [k, label, ic, col] of tiles) echo('<a class="stat ' + col + (k === f ? " on" : "") + '" href="' + h(url("hs_users", Object.assign(k === "" ? {} : { f: k }, without(qs, "f", "pg")))) + '"><span class="si">' + icon(ic) + "</span><div><small>" + h(label) + "</small><b>" + C.numberFormat(cnt[k], 0, ",", ".") + "</b></div></a>");
   echo("</div>");
 
   echo('<form method="post" id="hv-form">' + csrf_field() + '<input type="hidden" name="act" value="delete"><input type="hidden" name="to" value=""><section class="card">');
-  echo('<div class="cardhead">' + icon("user") + '<strong>Users</strong><span class="muted hscnt">' + total + ' total</span><span class="spacer"></span>');
+  echo('<div class="cardhead">' + icon("ticket") + '<div class="ttl"><strong>Voucher</strong><small>' + C.numberFormat(total, 0, ",", ".") + " voucher · data router " + date("H:i:s", hs_users_at() || C.now()) + '</small></div><div class="tools">');
   echo('<button class="btn small bad" id="hv-bulk" data-confirm="Hapus voucher yang dicentang?" data-comment="' + h(fComment) + '" data-total="' + total + '">Remove 0</button>' + (fComment !== "" ? '<input type="hidden" name="comment" value="' + h(fComment) + '">' : ""));
-  echo('<a class="hl" href="' + h(url("hs_users", Object.assign({}, qs, { fresh: 1 }))) + '" title="Reload Data" aria-label="Reload Data">' + icon("reload") + '</a><span class="muted hsuat" title="Waktu data diambil dari router. Klik Reload untuk mengambil ulang sekarang.">Data ' + date("H:i:s", hs_users_at() || C.now()) + "</span>");
-  if (view.length) echo('<details class="xdd printdd"><summary class="btn small" title="Mencetak voucher yang dicentang. Bila tidak ada yang dicentang, semua voucher yang tampil di tabel dicetak.">' + icon("print") + "Print" + icon("chev") + '</summary><div class="xmenu"><div class="xhint">Yang dicentang, atau semua yang tampil</div><button type="button" data-print="default" data-qr="no">Default<small>Kartu voucher standar</small></button><button type="button" data-print="default" data-qr="yes">QR<small>Voucher dengan kode QR</small></button><button type="button" data-print="small" data-qr="no">Small<small>Ringkas, cocok untuk thermal</small></button></div></details>');
-  echo(export_btn("hs_users", qs));
-  echo('<a class="hl" href="' + h(url("hs_generate", fProfile !== "" ? { profile: fProfile } : {})) + '">' + icon("plus") + 'Generate</a><a class="hl" href="' + h(url("hs_generate", { one: 1 })) + '">' + icon("plus") + "Add User</a></div>");
+  echo('<a class="hl icon" href="' + h(url("hs_users", Object.assign({}, qs, { fresh: 1 }))) + '" title="Ambil ulang dari router" aria-label="Reload Data">' + icon("reload") + "</a>");
+  if (view.length) echo('<details class="xdd printdd"><summary class="hl" title="Cetak voucher yang dicentang, atau semua yang tampil">' + icon("print") + "Print" + icon("chev") + '</summary><div class="xmenu"><div class="xhint">Yang dicentang, atau semua hasil saringan</div><button type="button" data-print="default" data-qr="no">Default<small>Kartu voucher standar</small></button><button type="button" data-print="default" data-qr="yes">QR<small>Voucher dengan kode QR</small></button><button type="button" data-print="small" data-qr="no">Small<small>Ringkas, cocok untuk thermal</small></button></div></details>');
+  echo('<details class="xdd"><summary class="hl">' + icon("down") + "Export" + icon("chev") + '</summary><div class="xmenu"><a href="' + h(url("hs_users", Object.assign({}, qs, { export: "xlsx" }))) + '">Excel (.xlsx)</a><a href="' + h(url("hs_users", Object.assign({}, qs, { export: "csv" }))) + '">CSV</a><a href="' + h(url("hs_users", Object.assign({}, qs, { export: "rsc" }))) + '">Script MikroTik (.rsc)</a></div></details>');
+  echo('<a class="hl" href="' + h(url("hs_generate", { one: 1 })) + '">' + icon("user") + 'Add User</a><a class="hl pri" href="' + h(url("hs_generate", fProfile !== "" ? { profile: fProfile } : {})) + '">' + icon("plus") + "Generate</a></div></div>");
   echo('<div class="cardbody"><div class="hsfilter"><input type="search" class="filter" form="hv-search" name="q" id="hv-q" value="' + h(get("q")) + '" placeholder="Cari nama, comment, MAC…" title="Menyaring sambil mengetik; tekan Enter untuk mencari di semua voucher" aria-label="Search"' + (view.length ? ' data-filter="#tbl"' : "") + ">");
   let base = without(qs, "profile", "pg");
-  echo('<select aria-label="Profile" onchange="location.href=this.value"><option value="' + h(url("hs_users", base)) + '">All Profile</option>');
+  echo('<select aria-label="Profile" onchange="location.href=this.value"' + (fProfile !== "" ? ' class="active"' : "") + '><option value="' + h(url("hs_users", base)) + '">Semua profil</option>');
   for (const k of ksorted(profiles)) echo('<option value="' + h(url("hs_users", Object.assign({ profile: k }, base))) + '"' + (k === fProfile ? " selected" : "") + ">" + h(k) + "</option>");
   echo("</select>");
   base = without(qs, "comment", "pg");
-  echo('<select aria-label="Comment" onchange="location.href=this.value"><option value="' + h(url("hs_users", base)) + '">All Comment</option>');
+  echo('<select aria-label="Comment" onchange="location.href=this.value"' + (fComment !== "" ? ' class="active"' : "") + '><option value="' + h(url("hs_users", base)) + '">Semua comment</option>');
   for (const k of ksorted(comments, true)) echo('<option value="' + h(url("hs_users", Object.assign({ comment: k }, base))) + '"' + (k === fComment ? " selected" : "") + ">" + h(k + " (" + comments[k] + ")") + "</option>");
   echo("</select>");
   base = without(qs, "f", "pg");
   echo('<select aria-label="Status" onchange="location.href=this.value"' + (f !== "" ? ' class="active"' : "") + ">");
-  for (const [k, v] of Object.entries({ "": "All Status", online: "Online", new: "Belum dipakai", off: "Offline", exp: "Expired" })) echo('<option value="' + h(url("hs_users", Object.assign(k === "" ? {} : { f: k }, base))) + '"' + (k === f ? " selected" : "") + ">" + h(v) + " (" + cnt[k] + ")</option>");
+  for (const [k, v] of Object.entries({ "": "Semua status", online: "Online", new: "Belum dipakai", off: "Offline", exp: "Expired" })) echo('<option value="' + h(url("hs_users", Object.assign(k === "" ? {} : { f: k }, base))) + '"' + (k === f ? " selected" : "") + ">" + h(v) + " (" + cnt[k] + ")</option>");
   echo("</select>");
-  if (Object.keys(qs).length) echo('<a class="btn small ghost" href="' + h(url("hs_users")) + '">Clear Filter</a>');
-  if (view.length) echo('<span class="hsnote">Print memakai baris yang dicentang, atau semua yang tampil</span>');
+  if (Object.keys(qs).length) echo('<a class="btn small ghost" href="' + h(url("hs_users")) + '">' + icon("minus") + "Hapus saringan</a>");
   echo("</div>");
   if (!view.length) {
     echo('<div class="empty"><p class="emptytitle">' + (Object.keys(qs).length ? "Tidak ada voucher yang cocok dengan saringan ini." : "Belum ada voucher.") + "</p>" + (!Object.keys(qs).length ? '<p><a class="btn primary" href="' + h(url("hs_generate")) + '">Generate voucher</a></p>' : "") + "</div>");
   } else {
-    echo('<div class="tablewrap"><table id="tbl" class="grid-t sortable" data-no-start="' + (pg - 1) * per + '"><thead><tr><th class="chk nosort"><input type="checkbox" data-checkall aria-label="Pilih semua"></th><th>Server</th><th>Name</th><th>Profile</th><th>Uptime</th><th class="r">Bytes In</th><th class="r">Bytes Out</th><th>Comment</th><th class="nosort"></th></tr></thead><tbody>');
+    echo('<div class="tablewrap"><table id="tbl" class="grid-t sortable" data-no-start="' + (pg - 1) * per + '"><thead><tr><th class="chk nosort"><input type="checkbox" data-checkall aria-label="Pilih semua"></th><th>Nama</th><th>Profil</th><th>Status</th><th class="r">Uptime</th><th class="r">Pemakaian</th><th>Comment</th><th class="nosort"></th></tr></thead><tbody>');
     for (const u of view) {
       const off = (u.disabled || "") === "true";
       const n = u.name;
@@ -171,12 +170,16 @@ module.exports = async function (C) {
       const cm = String(u.comment || "");
       const ex = expOf(cm);
       const dead = isExp(u);
-      const st = on ? '<span class="dotst on" title="Online ' + h(online[n]) + '"></span>' : "";
+      const isNew = !used(u) && !ex;
+      const st = off ? badge("Disabled", "warn") : on ? '<span class="badge ok" title="' + h(online[n]) + '">Online</span>' : dead ? badge("Expired", "bad") : isNew ? badge("Baru", "info") : '<span class="badge">Offline</span>';
+      const secs = dur_secs(u.uptime || "");
+      const bi = floatv(u["bytes-in"]), bo = floatv(u["bytes-out"]);
       echo('<tr data-href="' + h(url("hs_generate", { id: u[".id"] })) + '"' + (off || dead ? ' class="off"' : "") + ">");
-      echo('<td class="chk"><input type="checkbox" name="ids[]" value="' + h(u[".id"]) + '" aria-label="Pilih ' + h(n) + '"></td><td>' + h(u.server || "all") + "</td>");
-      echo('<td class="key mono" data-v="' + h(n) + '">' + st + '<a class="namelink" href="' + h(url("hs_generate", { id: u[".id"] })) + '">' + h(n) + "</a>" + (off ? '<span class="stb">' + badge("Disabled", "warn") + "</span>" : dead ? '<span class="stb">' + badge("Expired", "bad") + "</span>" : "") + "</td>");
-      echo("<td>" + h(u.profile || "") + '</td><td class="mono" data-v="' + dur_secs(u.uptime || "") + '">' + h(dur_fmt(u.uptime || "")) + '</td><td class="r" data-v="' + floatv(u["bytes-in"]) + '">' + bytes(u["bytes-in"] || 0) + '</td><td class="r" data-v="' + floatv(u["bytes-out"]) + '">' + bytes(u["bytes-out"] || 0) + "</td>");
-      echo('<td data-v="' + h(ex ? ros_date(ex[0]) + ex[0].slice(-8) : cm) + '">' + (cm !== "" ? '<a class="cmflt" href="' + h(url("hs_users", { comment: cm })) + '" title="Saring comment ini" aria-label="Saring comment ' + h(cm) + '">' + icon("search") + "</a>" : "") + '<span class="ell" title="' + h(cm) + '">' + h(cm) + "</span>" + (!ex && legacy[n] ? ' <span class="muted">(habis ' + h(legacy[n]) + ")</span>" : "") + "</td>");
+      echo('<td class="chk"><input type="checkbox" name="ids[]" value="' + h(u[".id"]) + '" aria-label="Pilih ' + h(n) + '"></td>');
+      echo('<td class="two" data-v="' + h(n) + '"><b class="mono"><a class="namelink" href="' + h(url("hs_generate", { id: u[".id"] })) + '">' + h(n) + "</a></b>" + ((u.server || "all") !== "all" ? "<small>" + h(u.server) + "</small>" : u["mac-address"] ? '<small class="mono">' + h(u["mac-address"]) + "</small>" : "") + "</td>");
+      echo("<td>" + h(u.profile || "") + "</td><td>" + st + '</td><td class="r mono" data-v="' + secs + '">' + (secs ? h(dur_fmt(u.uptime)) : '<span class="dash">—</span>') + "</td>");
+      echo('<td class="use" data-v="' + (bi + bo) + '">' + (bi + bo ? "<span><i>↓</i>" + bytes(bo) + "</span><span><i>↑</i>" + bytes(bi) + "</span>" : '<span class="dash">—</span>') + "</td>");
+      echo('<td class="cm" data-v="' + h(ex ? ros_date(ex[0]) + ex[0].slice(-8) : cm) + '">' + (cm !== "" ? '<a class="cmflt" href="' + h(url("hs_users", { comment: cm })) + '" title="Saring comment ini" aria-label="Saring comment ' + h(cm) + '">' + icon("search") + "</a>" : "") + '<span class="ell" title="' + h(cm) + '">' + h(cm) + "</span>" + (!ex && legacy[n] ? ' <span class="muted">(habis ' + h(legacy[n]) + ")</span>" : "") + "</td>");
       echo('<td class="acts">' + row_menu(['<a href="' + h(url("hs_generate", { id: u[".id"] })) + '">Edit</a>', '<a target="_blank" href="' + h(url("voucher_print", { user: n, qr: "no" })) + '">Print</a>', '<a target="_blank" href="' + h(url("voucher_print", { user: n, qr: "yes" })) + '">Print QR</a>', on ? '<button name="id" value="' + h(u[".id"]) + '" onclick="this.form.act.value=\'kick\'">Remove Active</button>' : "", '<button name="id" value="' + h(u[".id"]) + '" onclick="this.form.act.value=\'toggle\';this.form.to.value=\'' + (off ? "no" : "yes") + '\'">' + (off ? "Enable" : "Disable") + "</button>", '<button name="id" value="' + h(u[".id"]) + '" onclick="this.form.act.value=\'reset\'">Reset counters</button>', '<button class="danger" name="id" value="' + h(u[".id"]) + '" data-confirm="Hapus voucher ' + h(n) + '?" onclick="this.form.act.value=\'delete\'">Remove</button>']) + "</td></tr>");
     }
     echo("</tbody></table></div>" + pager_html(total, pg, per, (p, s) => url("hs_users", Object.assign({}, qs, { pg: p, per: s }))));

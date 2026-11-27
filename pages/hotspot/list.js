@@ -48,49 +48,58 @@ module.exports = async function (C) {
     echo('<select name="server" aria-label="Server"><option value="">all</option>' + servers.map((x) => opt(x.name, "")).join("") + '</select><select name="type" aria-label="Type"><option value="bypassed">bypassed</option><option value="regular">regular</option><option value="blocked">blocked</option></select><input name="comment" placeholder="Comment" aria-label="Comment" autocomplete="off"><button class="btn primary">' + icon("save") + "Save</button></form></div></details>");
   }
   echo('<form method="post" id="ls-form">' + csrf_field() + '<input type="hidden" name="act" value="delete"><input type="hidden" name="to" value=""><section class="card">');
-  echo('<div class="cardhead">' + icon(ic) + "<strong>" + h(title) + '</strong><span class="muted hscnt">' + tot + ' total</span><a class="hl" href="' + h(url("list", { s })) + '" title="Reload Data" aria-label="Reload Data">' + icon("reload") + '</a><span class="spacer"></span>');
-  echo('<button class="btn small bad" id="ls-bulk" onclick="this.form.act.value=\'delete\'" data-confirm="' + (s === "hs_active" ? "Putuskan koneksi semua yang dicentang?" : "Hapus semua yang dicentang?") + '">' + verb + " 0</button>" + (rows.length ? '<input type="search" class="filter" placeholder="Search" data-filter="#tbl" aria-label="Filter">' : "") + '</div><div class="cardbody">');
+  const sub = { hs_active: "user yang sedang login", hs_hosts: "perangkat yang terlihat hotspot", hs_bindings: "aturan bypass / blokir", hs_cookies: "login otomatis tersimpan" }[s];
+  echo('<div class="cardhead">' + icon(ic) + '<div class="ttl"><strong>' + h(title) + "</strong><small>" + tot + " " + sub + '</small></div><div class="tools">');
+  echo('<button class="btn small bad" id="ls-bulk" onclick="this.form.act.value=\'delete\'" data-confirm="' + (s === "hs_active" ? "Putuskan koneksi semua yang dicentang?" : "Hapus semua yang dicentang?") + '">' + verb + " 0</button>" + (rows.length ? '<input type="search" class="filter" placeholder="Cari…" data-filter="#tbl" aria-label="Filter">' : "") + '<a class="hl icon" href="' + h(url("list", { s })) + '" title="Muat ulang" aria-label="Reload Data">' + icon("reload") + '</a></div></div><div class="cardbody">');
   if (!rows.length) echo('<div class="empty"><p class="emptytitle">' + (s === "hs_active" ? "Belum ada user yang terhubung." : "Belum ada data.") + "</p></div>");
   else {
-    echo('<div class="tablewrap"><table id="tbl" class="grid-t sortable"><thead><tr><th class="chk nosort"><input type="checkbox" data-checkall aria-label="Pilih semua"></th>');
-    for (const [k, l] of Object.entries(cols)) echo("<th" + (k.startsWith("bytes") ? ' class="r"' : "") + ">" + h(l) + "</th>");
-    echo('<th class="nosort"></th></tr></thead><tbody>');
+    const two = (b, sm, mono) => '<td class="two"><b' + (mono ? ' class="mono"' : "") + ">" + (b || '<span class="dash">—</span>') + "</b>" + (sm ? "<small" + (mono ? ' class="mono"' : "") + ' title="' + h(sm.replace(/<[^>]+>/g, "")) + '">' + sm + "</small>" : "") + "</td>";
+    const use = (bi, bo) => '<td class="use" data-v="' + (floatv(bi) + floatv(bo)) + '"><span><i>↓</i>' + bytes(bo) + "</span><span><i>↑</i>" + bytes(bi) + "</span></td>";
+    const yes = (v, t, cls) => (v === "true" ? badge(t, cls) + " " : "");
+    const cmTd = (c) => '<td class="cm"><span class="ell" title="' + h(c || "") + '">' + (c ? h(c) : '<span class="dash">—</span>') + "</span></td>";
+    const head = {
+      hs_active: ["User", "Alamat", "Uptime", "Pemakaian", "Login"],
+      hs_hosts: ["Perangkat", "To Address", "Server", "Status", "Comment"],
+      hs_bindings: ["Perangkat", "To Address", "Server", "Type", "Comment"],
+      hs_cookies: ["User", "MAC Address", "Domain", "Berlaku"],
+    }[s];
+    echo('<div class="tablewrap"><table id="tbl" class="grid-t sortable"><thead><tr><th class="chk nosort"><input type="checkbox" data-checkall aria-label="Pilih semua"></th>' + head.map((x) => "<th" + (x === "Pemakaian" || x === "Uptime" ? ' class="r"' : "") + ">" + x + "</th>").join("") + '<th class="nosort"></th></tr></thead><tbody>');
+    if (s === "hs_active") {
+      uid = {};
+      for (const u of await rq("/ip/hotspot/user/print", { ".proplist": ".id,name" })) uid[u.name] = u[".id"];
+    }
     for (const r of rows) {
       const off = (r.disabled || "") === "true";
-      echo("<tr" + (off ? ' class="off"' : "") + '><td class="chk"><input type="checkbox" name="ids[]" value="' + h(r[".id"]) + '" aria-label="Pilih"></td>');
-      let first = true;
-      for (const k of Object.keys(cols)) {
-        const v = r[k] !== undefined ? r[k] : "";
-        if (first) {
-          first = false;
-          if (k === "user" && uid === null) {
-            uid = {};
-            for (const u of await rq("/ip/hotspot/user/print", { ".proplist": ".id,name" })) uid[u.name] = u[".id"];
-          }
-          const lnk = k === "user" ? (uid[v] !== undefined ? url("hs_generate", { id: uid[v] }) : url("hs_generate", { one: 1 })) : "";
-          echo('<td class="key' + (k === "mac-address" ? " mono" : "") + '">' + (lnk !== "" && v !== "" ? '<a class="namelink" href="' + h(lnk) + '">' + h(v) + "</a>" : h(v)) + "</td>");
-          continue;
-        }
-        if (k.startsWith("bytes")) echo('<td class="r" data-v="' + floatv(v) + '">' + bytes(v) + "</td>");
-        else if (["uptime", "session-time-left", "expires-in"].includes(k)) echo('<td class="mono" data-v="' + dur_secs(v) + '">' + h(dur_fmt(v)) + "</td>");
-        else if (v === "true" || v === "false") echo("<td>" + (v === "true" ? badge("Yes", "ok") : '<span class="muted">No</span>') + "</td>");
-        else if (k === "type") echo("<td>" + badge(v, v === "blocked" ? "bad" : v === "bypassed" ? "ok" : "") + "</td>");
-        else echo("<td" + (["mac-address", "address", "to-address"].includes(k) ? ' class="mono"' : "") + ">" + h(v) + "</td>");
+      let o = "<tr" + (off ? ' class="off"' : "") + '><td class="chk"><input type="checkbox" name="ids[]" value="' + h(r[".id"]) + '" aria-label="Pilih"></td>';
+      if (s === "hs_active") {
+        const lnk = uid[r.user] !== undefined ? url("hs_generate", { id: uid[r.user] }) : url("hs_generate", { one: 1 });
+        o += two('<a class="namelink" href="' + h(lnk) + '">' + h(r.user) + "</a>", h(r.comment || ""), false);
+        o += two(h(r.address), h(r["mac-address"]), true);
+        o += '<td class="two r" data-v="' + dur_secs(r.uptime) + '"><b class="mono">' + h(dur_fmt(r.uptime)) + "</b>" + (r["session-time-left"] ? "<small>sisa " + h(dur_fmt(r["session-time-left"])) + "</small>" : "") + "</td>";
+        o += use(r["bytes-in"], r["bytes-out"]);
+        o += '<td><span class="badge' + (String(r["login-by"]).includes("cookie") ? "" : " info") + '">' + h(r["login-by"] || "-") + "</span>" + (r.server && r.server !== "all" ? '<small class="muted"> ' + h(r.server) + "</small>" : "") + "</td>";
+        o += '<td class="acts"><button class="icbtn bad" name="id" value="' + h(r[".id"]) + '" title="Putuskan" aria-label="Putuskan ' + h(r.user || "") + '" data-confirm="Putuskan koneksi ' + h(r.user || "") + '?" onclick="this.form.act.value=\'delete\'">' + icon("out") + "</button></td></tr>";
+        echo(o);
+        continue;
       }
-      echo('<td class="acts">');
-      if (s === "hs_active") echo('<button class="btn small bad" name="id" value="' + h(r[".id"]) + '" data-confirm="Putuskan koneksi ' + h(r.user || "") + '?" onclick="this.form.act.value=\'delete\'">Remove</button>');
-      else {
-        const btn = (label, act, to, ask = "", cls = "") => "<button" + (cls !== "" ? ' class="' + cls + '"' : "") + ' name="id" value="' + h(r[".id"]) + '"' + (ask !== "" ? ' data-confirm="' + h(ask) + '"' : "") + " onclick=\"this.form.act.value='" + act + "';this.form.to.value='" + to + "'\">" + h(label) + "</button>";
-        const items = [];
-        if (s === "hs_hosts" && r["mac-address"]) {
-          items.push(btn("Make Bypassed", "bind", "bypassed", "Buat IP binding bypassed untuk " + r["mac-address"] + "? Perangkat ini bisa internet tanpa login."));
-          items.push(btn("Make Blocked", "bind", "blocked", "Blokir " + r["mac-address"] + " lewat IP binding?"));
-        }
-        if (s === "hs_bindings") for (const t of ["regular", "bypassed", "blocked"]) if ((r.type || "") !== t) items.push(btn("Set " + t[0].toUpperCase() + t.slice(1), "type", t));
-        items.push(btn("Remove", "delete", "", "Hapus item ini?", "danger"));
-        echo(row_menu(items));
+      if (s === "hs_cookies") {
+        o += '<td class="key">' + h(r.user || "") + '</td><td class="mono">' + h(r["mac-address"] || "") + "</td><td>" + (h(r.domain || "") || '<span class="dash">—</span>') + '</td><td class="mono" data-v="' + dur_secs(r["expires-in"]) + '">' + h(dur_fmt(r["expires-in"] || "")) + "</td>";
+      } else {
+        o += two(h(r["mac-address"] || r.address || ""), r["mac-address"] && r.address ? h(r.address) : "", true);
+        o += '<td class="mono">' + (h(r["to-address"] || "") || '<span class="dash">—</span>') + "</td><td>" + h(r.server || "all") + "</td>";
+        if (s === "hs_hosts") o += "<td>" + (yes(r.authorized, "Login", "ok") + yes(r.bypassed, "Bypass", "info") || '<span class="badge">Belum login</span>') + "</td>";
+        else o += "<td>" + badge(r.type || "regular", r.type === "blocked" ? "bad" : r.type === "bypassed" ? "ok" : "") + "</td>";
+        o += cmTd(r.comment);
       }
-      echo("</td></tr>");
+      const btn = (label, act, to, ask = "", cls = "") => "<button" + (cls !== "" ? ' class="' + cls + '"' : "") + ' name="id" value="' + h(r[".id"]) + '"' + (ask !== "" ? ' data-confirm="' + h(ask) + '"' : "") + " onclick=\"this.form.act.value='" + act + "';this.form.to.value='" + to + "'\">" + h(label) + "</button>";
+      const items = [];
+      if (s === "hs_hosts" && r["mac-address"]) {
+        items.push(btn("Jadikan bypass", "bind", "bypassed", "Buat IP binding bypassed untuk " + r["mac-address"] + "? Perangkat ini bisa internet tanpa login."));
+        items.push(btn("Blokir", "bind", "blocked", "Blokir " + r["mac-address"] + " lewat IP binding?"));
+      }
+      if (s === "hs_bindings") for (const t of ["regular", "bypassed", "blocked"]) if ((r.type || "") !== t) items.push(btn("Ubah ke " + t, "type", t));
+      items.push(btn("Hapus", "delete", "", "Hapus item ini?", "danger"));
+      echo(o + '<td class="acts">' + row_menu(items) + "</td></tr>");
     }
     echo('</tbody></table></div><p class="count"><span data-count="#tbl">' + tot + "</span> dari " + tot + " item</p>");
   }

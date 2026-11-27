@@ -58,7 +58,7 @@ module.exports = async function (C) {
   const rows = await rq(path + "/print", { ".proplist": props });
   const cols = s === "scheduler" ? { name: "Name", "start-date": "Start Date", "start-time": "Start Time", interval: "Interval", "next-run": "Next Run", "run-count": "Run Count" } : { host: "Host", status: "Status", since: "Since", interval: "Interval", timeout: "Timeout", comment: "Comment" };
   await page_head(title);
-  echo('<section class="card"><div class="cardhead">' + icon(ic) + "<strong>" + h(title) + '</strong><span class="muted">' + rows.length + ' item</span><span class="spacer"></span>' + (rows.length ? '<input type="search" class="filter" placeholder="Search" data-filter="#tbl" aria-label="Filter">' : "") + '<a class="hl" href="' + h(url("system", { s })) + '" title="Reload Data" aria-label="Reload Data">' + icon("reload") + '</a></div><div class="cardbody">');
+  echo('<section class="card"><div class="cardhead">' + icon(ic) + "<strong>" + h(title) + '</strong><span class="muted">' + rows.length + ' item</span><span class="spacer"></span>' + (rows.length ? '<input type="search" class="filter" placeholder="Search" data-filter="#tbl" aria-label="Filter">' : "") + '<a class="hl icon" href="' + h(url("system", { s })) + '" title="Muat ulang" aria-label="Reload Data">' + icon("reload") + '</a></div><div class="cardbody">');
   if (!rows.length) echo('<div class="empty"><p class="emptytitle">Belum ada ' + h(title.toLowerCase()) + " di router ini.</p></div>");
   else {
     echo('<div class="tablewrap"><table id="tbl" class="grid-t sortable"><thead><tr><th class="dotc nosort"></th>' + Object.values(cols).map((l) => "<th>" + h(l) + "</th>").join("") + '<th class="nosort"></th></tr></thead><tbody>');

@@ -47,7 +47,7 @@ module.exports = async function (C) {
       e = p;
       form = true;
     }
-  await page_head("User Profile", form ? "" : '<a class="btn primary" href="' + h(url("hs_profiles", { add: 1 })) + '">' + icon("plus") + "Add Profile</a>");
+  await page_head("User Profile");
   if (form) {
     const m = hs_meta((e && e["on-login"]) || "");
     const pools = await rq("/ip/pool/print", { ".proplist": "name,ranges" });
@@ -88,7 +88,7 @@ module.exports = async function (C) {
   const [, miss] = await hs_mon_ensure(false);
   const mon = await hs_mon_row();
   const monOk = !miss.length && mon && (mon.disabled || "") !== "true";
-  echo('<section class="card"><div class="cardhead">' + icon("pie") + '<strong>User Profile</strong><span class="muted">' + profiles.length + ' profil</span><span class="spacer"></span><input type="search" class="filter" data-filter="#tbl" placeholder="Cari profil…" aria-label="Cari"><a class="hl" href="' + h(url("hs_profiles")) + '" title="Reload Data" aria-label="Reload Data">' + icon("reload") + "</a></div><div class=\"cardbody\">");
+  echo('<section class="card"><div class="cardhead">' + icon("pie") + '<div class="ttl"><strong>User Profile</strong><small>' + profiles.length + ' profil voucher</small></div><div class="tools"><input type="search" class="filter" data-filter="#tbl" placeholder="Cari profil…" aria-label="Cari"><a class="hl icon" href="' + h(url("hs_profiles")) + '" title="Muat ulang" aria-label="Reload Data">' + icon("reload") + '</a><a class="hl pri" href="' + h(url("hs_profiles", { add: 1 })) + '">' + icon("plus") + 'Add Profile</a></div></div><div class="cardbody">');
   if (!monOk) echo('<p class="msg err"><span>Expire Monitor di router belum lengkap' + (miss.length ? " (" + h(miss.join(", ")) + ")" : "") + ": voucher tidak akan kedaluwarsa. Buka salah satu profil ber-Expired Mode lalu Save untuk memasangnya.</span></p>");
   echo('<div class="tablewrap"><table id="tbl" class="grid-t sortable"><thead><tr><th>Name</th><th class="sh">Shared Users</th><th>Rate Limit</th><th>Expired Mode</th><th>Validity</th><th class="r">Price</th><th class="r">Selling Price</th><th class="r">Vouchers</th><th class="nosort"></th></tr></thead><tbody>');
   for (const p of profiles) {

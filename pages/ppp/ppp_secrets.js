@@ -237,13 +237,13 @@ module.exports = async function (C) {
     for (const [k, v] of Object.entries(tags)) if (v) cnt[k]++;
     if (tags[f]) rows.push([s, c, st, isIso, on, off]);
   }
-  await page_head("PPP User", '<a class="btn primary" href="' + h(url("ppp_secrets", { add: 1 })) + '">' + icon("plus") + "Add User</a>");
+  await page_head("PPP User");
   const sched = (await ppp_sched_ok()) ? await ppp_sched_state() : { ok: false };
   const tiles = [["", "Total User", "user", "blue"], ["online", "Online", "link", "green"], ["offline", "Offline", "wifi", "gray"], ["late", "Menunggak", "money", "red"]];
   echo('<div class="stats">');
   for (const [k, label, ic, col] of tiles) echo('<a class="stat ' + col + (k === f ? " on" : "") + '" href="' + h(url("ppp_secrets", k === "" ? {} : { f: k })) + '"><span class="si">' + icon(ic) + "</span><div><small>" + h(label) + "</small><b>" + C.numberFormat(cnt[k], 0, ",", ".") + "</b></div></a>");
   echo("</div>");
-  echo('<section class="card"><div class="cardhead">' + icon("user") + '<strong>PPP User</strong><span class="muted hscnt">' + cnt[""] + ' total</span><span class="spacer"></span><button type="button" class="btn small bad" id="ps-bulk">Remove 0</button><a class="hl" href="' + h(url("ppp_secrets", f === "" ? {} : { f })) + '" title="Reload Data" aria-label="Reload Data">' + icon("reload") + "</a></div>");
+  echo('<section class="card"><div class="cardhead">' + icon("user") + '<div class="ttl"><strong>Pelanggan PPP</strong><small>' + cnt[""] + " secret · " + cnt.online + ' online</small></div><div class="tools"><button type="button" class="btn small bad" id="ps-bulk">Remove 0</button><a class="hl icon" href="' + h(url("ppp_secrets", f === "" ? {} : { f })) + '" title="Muat ulang" aria-label="Reload Data">' + icon("reload") + '</a><a class="hl" href="' + h(url("ppp_payment")) + '">' + icon("money") + 'Pembayaran</a><a class="hl pri" href="' + h(url("ppp_secrets", { add: 1 })) + '">' + icon("plus") + "Add User</a></div></div>");
   echo('<div class="cardbody"><div class="hsfilter">' + (rows.length ? '<input type="search" class="filter" placeholder="Cari user, nama, profile…" data-filter="#tbl" aria-label="Search">' : "") + '<select aria-label="Saring status" onchange="location.href=this.value"' + (f !== "" ? ' class="active"' : "") + ">");
   for (const [k, v] of Object.entries({ "": "Semua status", online: "Online", offline: "Offline", disabled: "Disabled", late: "Menunggak", soon: "Segera jatuh tempo", iso: "Diisolir" })) echo('<option value="' + h(url("ppp_secrets", k === "" ? {} : { f: k })) + '"' + (k === f ? " selected" : "") + ">" + h(v) + " (" + cnt[k] + ")</option>");
   echo("</select>" + (f !== "" ? '<a class="btn small ghost" href="' + h(url("ppp_secrets")) + '">Clear Filter</a>' : "") + "</div>");
