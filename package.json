@@ -1,6 +1,6 @@
 {
   "name": "bilingku",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Billing PPPoE & Hotspot MikroTik (Node.js, tanpa PHP, tanpa dependensi)",
   "main": "server.js",
   "private": true,
