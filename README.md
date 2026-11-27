@@ -41,7 +41,7 @@ Environment: `PORT` (bawaan 8092), `HOST` (bawaan 127.0.0.1), `DATA_DIR` (bawaan
 - Backup `.zip` dari versi PHP bisa di-restore di versi ini, dan sebaliknya.
 - Perbaikan: tanggal di comment secret PPP sekarang tepat sama dengan Jatuh Tempo (versi PHP menulis 2 hari lebih lambat karena bug pembacaan tanggal PHP). Comment diperbarui otomatis saat pelanggan disimpan / dibayar, atau lewat *Admin Settings → Reinstall Scheduler*.
 
-Versi PHP terakhir tersimpan di tag `v3.5.7-php` (untuk shared hosting).
+Versi PHP terakhir (3.5.7, untuk shared hosting) tersimpan di branch `php-lama`.
 
 ## Keamanan
 
